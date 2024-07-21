@@ -4,11 +4,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	"messagio/adapters/handler"
-	messageHandler "messagio/adapters/handler/message"
 	"messagio/adapters/repository"
-	messageRepo "messagio/adapters/repository/message"
 	"messagio/adapters/repository/migrations"
-	messageService "messagio/core/service/message"
+	"messagio/core/service"
 )
 
 func main() {
@@ -23,19 +21,17 @@ func main() {
 	}
 
 	// Repos
-	repoMessage := messageRepo.GetRepo(db)
+	repoMessage := repository.GetMessage(db)
 
 	// Services
-	serviceMessage := messageService.GetService(repoMessage)
+	serviceMessage := service.GetMessage(repoMessage)
 
 	// Handlers
-	handlerMessage := messageHandler.GetHandler(serviceMessage)
+	handlerMessage := handler.GetMessage(serviceMessage)
 
 	// Server setup
-	services := handler.Services{
-		ServiceMessage: serviceMessage,
-	}
-	server := handler.GetServerInstance(&services)
+
+	server := handler.GetServerInstance()
 	group := server.Echo.Group("/api/v1")
 
 	// Routes

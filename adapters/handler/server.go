@@ -1,32 +1,38 @@
 package handler
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"log"
 	"messagio/core/enums/env"
-	"messagio/core/ports"
 	"messagio/utils"
 )
 
-func GetServerInstance(services *Services) *Server {
-	echoInstance := echo.New()
-	echoInstance.IPExtractor = echo.ExtractIPFromXFFHeader()
+type CustomValidator struct {
+	validator *validator.Validate
+}
 
-	server := &Server{
-		Echo:     echoInstance,
-		Services: services,
+func (cv *CustomValidator) Validate(i interface{}) error {
+	if err := cv.validator.Struct(i); err != nil {
+		return err
 	}
-
-	return server
+	return nil
 }
 
 type Server struct {
-	Echo     *echo.Echo
-	Services *Services
+	Echo *echo.Echo
 }
 
-type Services struct {
-	ServiceMessage ports.ServiceMessage
+func GetServerInstance() *Server {
+	echoInstance := echo.New()
+	echoInstance.IPExtractor = echo.ExtractIPFromXFFHeader()
+	echoInstance.Validator = &CustomValidator{validator: validator.New()}
+
+	server := &Server{
+		Echo: echoInstance,
+	}
+
+	return server
 }
 
 func (s *Server) StartDebug() {
