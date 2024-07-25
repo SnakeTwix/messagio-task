@@ -30,6 +30,7 @@ func (h *Message) RegisterRoutes(group *echo.Group) {
 	group.POST("/message", h.createMessage)
 	group.GET("/message/:id", h.getMessage)
 	group.GET("/message", h.getMessages)
+	group.GET("/message/process", h.processMessage)
 }
 
 func (h *Message) createMessage(ctx echo.Context) error {
@@ -81,6 +82,15 @@ func (h *Message) getMessages(ctx echo.Context) error {
 	messages, err := h.serviceMessage.GetMessages(ctx.Request().Context(), paginateOptions)
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, messages)
+}
+
+func (h *Message) processMessage(ctx echo.Context) error {
+	messages, err := h.serviceMessage.GetNewMessages(ctx.Request().Context())
+	if err != nil {
+		return ctx.String(http.StatusInternalServerError, "Something went wrong")
 	}
 
 	return ctx.JSON(http.StatusOK, messages)

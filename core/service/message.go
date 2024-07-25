@@ -44,3 +44,7 @@ func (s *Message) GetMessages(ctx context.Context, paginateOptions entity.Pagina
 
 	return s.repoMessage.GetMessages(ctx, computedOptions)
 }
+
+func (s *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) {
+	return s.repoMessage.GetNewMessages(ctx)
+}

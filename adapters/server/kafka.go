@@ -19,6 +19,7 @@ func initKafka() *KafkaConn {
 	kafkaMessageReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{utils.GetEnv(env.KafkaAddress)},
 		Topic:     utils.GetEnv(env.KafkaMessageTopic),
+		GroupID:   "message-consumer",
 		Partition: 0,
 		MaxBytes:  10e6, // 10 mb
 	})
