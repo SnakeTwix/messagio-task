@@ -33,7 +33,17 @@ func (s *Message) CreateMessage(ctx context.Context, createMessage *entity.Creat
 }
 
 func (s *Message) GetMessage(ctx context.Context, messageId uint64) (*entity.Message, error) {
-	return s.repoMessage.GetMessage(ctx, messageId)
+	message, err := s.repoMessage.GetMessage(ctx, messageId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repoMessage.ReadMessage(ctx, message.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return message, nil
 }
 
 func (s *Message) GetMessages(ctx context.Context, paginateOptions entity.PaginateRequest) (*entity.PaginateResponse[entity.Message], error) {
@@ -42,9 +52,44 @@ func (s *Message) GetMessages(ctx context.Context, paginateOptions entity.Pagina
 		Offset: (paginateOptions.Page - 1) * paginateOptions.Limit,
 	}
 
-	return s.repoMessage.GetMessages(ctx, computedOptions)
+	paginatedMessages, err := s.repoMessage.GetMessages(ctx, computedOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	for index := range paginatedMessages.Values {
+		message := &paginatedMessages.Values[index]
+
+		err = s.repoMessage.ReadMessage(ctx, message.ID)
+		if err != nil {
+			continue
+		}
+	}
+
+	return paginatedMessages, nil
 }
 
 func (s *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) {
-	return s.repoMessage.GetNewMessages(ctx)
+	messages, err := s.repoMessage.GetNewMessages(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for index := range messages {
+		message := &messages[index]
+		message.KafkaProcessed = true
+
+		err = s.repoMessage.UpdateMessage(ctx, message)
+		if err != nil {
+			continue
+		}
+
+		// This is 3 queries PER message. Quite a lot, would be ideal to batch, yeah...
+		err = s.repoMessage.ReadMessage(ctx, message.ID)
+		if err != nil {
+			continue
+		}
+	}
+
+	return messages, nil
 }

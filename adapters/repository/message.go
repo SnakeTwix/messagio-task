@@ -52,7 +52,6 @@ func (r *Message) CreateMessage(ctx context.Context, message *entity.Message) er
 
 func (r *Message) GetMessage(ctx context.Context, messageId uint64) (*entity.Message, error) {
 	var message entity.Message
-
 	result := r.db.WithContext(ctx).First(&message, messageId)
 
 	return &message, result.Error
@@ -106,23 +105,9 @@ func (r *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) 
 	}
 
 	for _, messageId := range messageIds {
-
 		// Could batch get and update this instead of sending many sql queries to the database
 		// but ehh... There is no native functionality for this
 		message, err := r.GetMessage(ctx, messageId)
-		if err != nil {
-			continue
-		}
-
-		message.KafkaProcessed = true
-
-		err = r.UpdateMessage(ctx, message)
-		if err != nil {
-			continue
-		}
-
-		// This is 3 queries PER message. Quite a lot, would be ideal to batch, yeah...
-		err = r.ReadMessage(ctx, messageId)
 		if err != nil {
 			continue
 		}

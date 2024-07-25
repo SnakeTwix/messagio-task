@@ -45,7 +45,6 @@ func (h *Message) createMessage(ctx echo.Context) error {
 	}
 
 	err := h.serviceMessage.CreateMessage(ctx.Request().Context(), &message)
-
 	if err != nil {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
@@ -60,13 +59,11 @@ func (h *Message) getMessage(ctx echo.Context) error {
 	}
 
 	message, err := h.serviceMessage.GetMessage(ctx.Request().Context(), messageId)
-
 	if err != nil {
 		return ctx.String(http.StatusNotFound, err.Error())
 	}
 
 	return ctx.JSON(http.StatusOK, &message)
-
 }
 
 func (h *Message) getMessages(ctx echo.Context) error {
