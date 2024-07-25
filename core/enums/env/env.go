@@ -8,3 +8,6 @@ const PostgresPassword = "POSTGRES_PASSWORD"
 const PostgresDb = "POSTGRES_DB"
 
 const ApiAddress = "API_ADDRESS"
+
+const KafkaAddress = "KAFKA_ADDRESS"
+const KafkaMessageTopic = "KAFKA_MESSAGE_TOPIC"

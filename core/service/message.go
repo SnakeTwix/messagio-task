@@ -35,3 +35,12 @@ func (s *Message) CreateMessage(ctx context.Context, createMessage *entity.Creat
 func (s *Message) GetMessage(ctx context.Context, messageId uint64) (*entity.Message, error) {
 	return s.repoMessage.GetMessage(ctx, messageId)
 }
+
+func (s *Message) GetMessages(ctx context.Context, paginateOptions entity.PaginateRequest) (*entity.PaginateResponse[entity.Message], error) {
+	computedOptions := entity.Paginate{
+		Limit:  paginateOptions.Limit,
+		Offset: (paginateOptions.Page - 1) * paginateOptions.Limit,
+	}
+
+	return s.repoMessage.GetMessages(ctx, computedOptions)
+}

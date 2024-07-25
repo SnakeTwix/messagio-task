@@ -5,7 +5,8 @@ import (
 	"github.com/labstack/gommon/log"
 	"messagio/adapters/handler"
 	"messagio/adapters/repository"
-	"messagio/adapters/repository/migrations"
+	"messagio/adapters/server"
+	"messagio/adapters/server/migrations"
 	"messagio/core/service"
 )
 
@@ -15,24 +16,21 @@ func main() {
 		panic(err)
 	}
 
-	db := repository.InitDB()
-	if err := migrations.RunMigrations(db); err != nil {
+	// Server setup
+	server := server.GetServerInstance()
+	if err := migrations.RunMigrations(server.Db); err != nil {
 		log.Fatal(err)
 	}
+	group := server.Echo.Group("/api/v1")
 
 	// Repos
-	repoMessage := repository.GetMessage(db)
+	repoMessage := repository.GetMessage(server.Db, server.Kafka.MessageReader, server.Kafka.MessageWriter)
 
 	// Services
 	serviceMessage := service.GetMessage(repoMessage)
 
 	// Handlers
 	handlerMessage := handler.GetMessage(serviceMessage)
-
-	// Server setup
-
-	server := handler.GetServerInstance()
-	group := server.Echo.Group("/api/v1")
 
 	// Routes
 	handlerMessage.RegisterRoutes(group)

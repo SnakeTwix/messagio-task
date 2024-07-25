@@ -29,6 +29,7 @@ func GetMessage(serviceMessage ports.ServiceMessage) *Message {
 func (h *Message) RegisterRoutes(group *echo.Group) {
 	group.POST("/message", h.createMessage)
 	group.GET("/message/:id", h.getMessage)
+	group.GET("/message", h.getMessages)
 }
 
 func (h *Message) createMessage(ctx echo.Context) error {
@@ -65,4 +66,22 @@ func (h *Message) getMessage(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, &message)
 
+}
+
+func (h *Message) getMessages(ctx echo.Context) error {
+	var paginateOptions entity.PaginateRequest
+	if err := ctx.Bind(&paginateOptions); err != nil {
+		return ctx.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := ctx.Validate(&paginateOptions); err != nil {
+		return ctx.String(http.StatusBadRequest, err.Error())
+	}
+
+	messages, err := h.serviceMessage.GetMessages(ctx.Request().Context(), paginateOptions)
+	if err != nil {
+		return ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, messages)
 }

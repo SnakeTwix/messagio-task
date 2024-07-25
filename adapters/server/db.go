@@ -1,4 +1,4 @@
-package repository
+package server
 
 import (
 	"fmt"
@@ -43,7 +43,7 @@ func initDSN() *DSNConfig {
 	}
 }
 
-func InitDB() *gorm.DB {
+func initDB() *gorm.DB {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -63,6 +63,6 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-
+	
 	return db
 }
