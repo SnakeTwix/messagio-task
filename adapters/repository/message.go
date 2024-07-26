@@ -41,6 +41,9 @@ func (r *Message) CreateMessage(ctx context.Context, message *entity.Message) er
 	byteId := make([]byte, 8)
 	binary.LittleEndian.PutUint64(byteId, message.ID)
 
+	// Ideally this would be in a listener for insert triggers
+	// But it's a bit complicated with the gorm structure and I don't quite have the time to figure out
+	// Where it goes in a hexagonal architecture
 	err := r.kafkaMessageWriter.WriteMessages(ctx,
 		kafka.Message{
 			Value: byteId,

@@ -40,10 +40,6 @@ func (s *Server) Close() {
 	}
 }
 
-func (s *Server) StartDebug() {
-	s.Echo.Logger.Info(s.Echo.Start(utils.GetEnv(env.ApiAddress)))
-}
-
 func (s *Server) Start() {
-	log.Fatal("NOT IMPLEMENTED")
+	s.Echo.Logger.Info(s.Echo.Start(utils.GetEnv(env.ApiAddress)))
 }

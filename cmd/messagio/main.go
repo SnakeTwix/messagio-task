@@ -37,5 +37,5 @@ func main() {
 	handlerMessage.RegisterRoutes(group)
 	handlerStatistic.RegisterRoutes(group)
 
-	server.StartDebug()
+	server.Start()
 }

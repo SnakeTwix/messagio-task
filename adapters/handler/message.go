@@ -49,7 +49,7 @@ func (h *Message) createMessage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	return ctx.String(http.StatusCreated, message.Content)
+	return ctx.NoContent(http.StatusCreated)
 }
 
 func (h *Message) getMessage(ctx echo.Context) error {

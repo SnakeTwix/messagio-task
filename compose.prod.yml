@@ -1,7 +1,7 @@
 services:
-  server-dev:
+  server-prod:
     build:
-      target: dev
+      target: prod
       dockerfile: Dockerfile
       context: .
     volumes:
