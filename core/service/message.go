@@ -93,3 +93,7 @@ func (s *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) 
 
 	return messages, nil
 }
+
+func (s *Message) GetFullMessage(ctx context.Context, messageId uint64) (*entity.Message, error) {
+	return s.repoMessage.GetFullMessage(ctx, messageId)
+}

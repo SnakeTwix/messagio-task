@@ -31,9 +31,11 @@ func main() {
 
 	// Handlers
 	handlerMessage := handler.GetMessage(serviceMessage)
+	handlerStatistic := handler.GetStatistic(serviceMessage)
 
 	// Routes
 	handlerMessage.RegisterRoutes(group)
+	handlerStatistic.RegisterRoutes(group)
 
 	server.StartDebug()
 }

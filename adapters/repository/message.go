@@ -85,7 +85,7 @@ func (r *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) 
 	defer cancel()
 	var lastMessage *kafka.Message
 
-	// Максимум обрабатывает 100 за раз
+	// Process at most 100 messages
 	for i := 0; i < 100; i++ {
 		message, err := r.kafkaMessageReader.FetchMessage(timeoutCtx)
 		if err != nil {
@@ -105,8 +105,8 @@ func (r *Message) GetNewMessages(ctx context.Context) ([]entity.Message, error) 
 	}
 
 	for _, messageId := range messageIds {
-		// Could batch get and update this instead of sending many sql queries to the database
-		// but ehh... There is no native functionality for this
+		// Could batch get this instead of sending many sql queries to the database
+		// Maybe look into how to do it with gorm
 		message, err := r.GetMessage(ctx, messageId)
 		if err != nil {
 			continue
@@ -128,4 +128,11 @@ func (r *Message) ReadMessage(ctx context.Context, messageId uint64) error {
 
 	result := r.db.WithContext(ctx).Create(&messageRead)
 	return result.Error
+}
+
+func (r *Message) GetFullMessage(ctx context.Context, messageId uint64) (*entity.Message, error) {
+	var message entity.Message
+	result := r.db.WithContext(ctx).Preload("ReadTimes").Find(&message, "messages.id = ?", messageId)
+
+	return &message, result.Error
 }

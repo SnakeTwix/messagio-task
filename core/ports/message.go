@@ -10,6 +10,7 @@ type ServiceMessage interface {
 	GetMessage(ctx context.Context, messageId uint64) (*entity.Message, error)
 	GetMessages(ctx context.Context, paginateOptions entity.PaginateRequest) (*entity.PaginateResponse[entity.Message], error)
 	GetNewMessages(ctx context.Context) ([]entity.Message, error)
+	GetFullMessage(ctx context.Context, messageId uint64) (*entity.Message, error)
 }
 
 type RepoMessage interface {
@@ -19,4 +20,5 @@ type RepoMessage interface {
 	GetNewMessages(ctx context.Context) ([]entity.Message, error)
 	UpdateMessage(ctx context.Context, message *entity.Message) error
 	ReadMessage(ctx context.Context, messageId uint64) error
+	GetFullMessage(ctx context.Context, messageId uint64) (*entity.Message, error)
 }
